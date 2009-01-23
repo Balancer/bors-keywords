@@ -1,43 +1,47 @@
-<?
+<?php
+
+require_once("include/classes/text/Stem_ru-utf8.php");
 	
 class common_keyword extends base_page_db
 {
-	function main_db_storage(){ return 'common'; }
+	function main_db_storage(){ return 'BORS'; }
 	function main_table_storage(){ return 'keywords'; }
-	
-    function field_title_storage() { return 'keyword(id)'; }
-	function field_create_time_storage() { return 'create_time(id)'; }
-	function field_modify_time_storage() { return 'modify_time(id)'; }
 
-	function resource_ids()
+    function main_table_fields()
 	{
-		$result = array();
-
-		foreach($this->db->get_array("SELECT * FROM authors_index WHERE author_id = ".$this->id()) as $x)
-			$result[] = $x['class_name'].'://'.$x['class_id'];
-
-		return $result;
+		return array(
+			'id',
+			'title' => 'keyword',
+			'keyword_original',
+			'modify_time',
+			'targets_count',
+		);
 	}
 
-	function find_by_name($keyword)
+	static function normalize($words)
 	{
-		$db = &new DataBase(common_keyword::main_db_storage());
-		return intval($db->get("SELECT id FROM keywords WHERE keyword='".addslashes(trim($keyword))."' LIMIT 1"));
+		$keywords = array();
+		$Stemmer = &new Lingua_Stem_Ru();
+
+		foreach(explode(' ', strtolower($words)) as $word)
+			if($word)
+				$keywords[] = $Stemmer->stem_word($word);
+
+		return join(' ', $keywords);
 	}
 
-	function store_by_name($keyword)
+	static function loader($words)
 	{
-		$keyword_id = common_keyword::find_by_name($keyword);
-		if($keyword_id)
-			return $keyword_id;
+		$keyword = common_keyword::normalize($words);
+		$x = objects_first('common_keyword', array('keyword' => $keyword));
+		if(!$x)
+		{
+			$x = object_new_instance('common_keyword', array(
+				'title' => $keyword,
+				'keyword_original' => $words,
+			));
+		}
 		
-		$db = &new DataBase(common_keyword::main_db_storage());
-		$db->insert('keywords', array(
-			'keyword' => trim($keyword),
-			'int create_time' => time(),
-			'int modify_time' => time(),
-		));
-		
-		return intval($db->last_id());
+		return $x;
 	}
 }
