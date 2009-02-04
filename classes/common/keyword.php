@@ -27,6 +27,8 @@ class common_keyword extends base_page_db
 			if($word)
 				$keywords[] = $Stemmer->stem_word($word);
 
+		sort($keywords);
+		
 		return join(' ', $keywords);
 	}
 
