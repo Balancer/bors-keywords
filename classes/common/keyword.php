@@ -11,7 +11,8 @@ class common_keyword extends base_page_db
 	{
 		return array(
 			'id',
-			'title' => 'keyword',
+			'keyword',
+			'title' => 'keyword_original',
 			'keyword_original',
 			'modify_time',
 			'targets_count',
@@ -39,11 +40,13 @@ class common_keyword extends base_page_db
 		if(!$x)
 		{
 			$x = object_new_instance('common_keyword', array(
-				'title' => $keyword,
+				'keyword' => $keyword,
 				'keyword_original' => $words,
 			));
 		}
 		
 		return $x;
 	}
+
+	function url() { return 'http://forums.balancer.ru/tags/'.trim($this->title()).'/'; }
 }

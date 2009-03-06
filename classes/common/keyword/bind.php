@@ -40,4 +40,6 @@ class common_keyword_bind extends base_page_db
 			));
 		}
 	}
+	
+	function object() { return object_load($this->target_class_id(), $this->target_object_id()); }
 }
