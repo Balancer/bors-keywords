@@ -5,7 +5,7 @@ require_once("include/classes/text/Stem_ru-utf8.php");
 class common_keyword extends base_page_db
 {
 	function main_db_storage(){ return 'BORS'; }
-	function main_table_storage(){ return 'keywords'; }
+	function main_table(){ return 'keywords'; }
 
     function main_table_fields()
 	{

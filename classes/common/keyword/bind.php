@@ -3,7 +3,7 @@
 class common_keyword_bind extends base_page_db
 {
 	function main_db_storage(){ return 'BORS'; }
-	function main_table_storage(){ return 'keywords_map'; }
+	function main_table(){ return 'keywords_map'; }
 	
     function main_table_fields()
 	{
