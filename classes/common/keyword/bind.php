@@ -2,7 +2,7 @@
 	
 class common_keyword_bind extends base_page_db
 {
-	function main_db_storage(){ return 'BORS'; }
+	function main_db_storage(){ return config('main_bors_db'); }
 	function main_table(){ return 'keywords_map'; }
 	
     function main_table_fields()
@@ -21,7 +21,7 @@ class common_keyword_bind extends base_page_db
 
 	static function add($object)
 	{
-		$db = new driver_mysql('BORS');
+		$db = new driver_mysql(config('main_bors_db'));
 		$db->delete('keywords_map', array('target_class_id' => $object->class_id(), 'target_object_id' => $object->id()));
 
 		foreach(explode(',', $object->keywords_string()) as $keyword)

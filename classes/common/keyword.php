@@ -1,10 +1,10 @@
 <?php
 
-require_once("include/classes/text/Stem_ru-utf8.php");
+require_once('classes/inc/text/Stem_ru-'.config('internal_charset').'.php');
 	
 class common_keyword extends base_page_db
 {
-	function main_db_storage(){ return 'BORS'; }
+	function main_db(){ return config('main_bors_db'); }
 	function main_table(){ return 'keywords'; }
 
     function main_table_fields()
@@ -42,6 +42,7 @@ class common_keyword extends base_page_db
 			$x = object_new_instance('common_keyword', array(
 				'keyword' => $keyword,
 				'keyword_original' => $words,
+				'targets_count' => 0,
 			));
 		}
 		
