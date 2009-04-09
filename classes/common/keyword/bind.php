@@ -19,9 +19,10 @@ class common_keyword_bind extends base_page_db
 		);
 	}
 
-	static function add($object)
+	static function add($object, $was_auto = false)
 	{
 		$db = new driver_mysql(config('main_bors_db'));
+
 		$db->delete('keywords_map', array('target_class_id' => $object->class_id(), 'target_object_id' => $object->id()));
 
 		foreach(explode(',', $object->keywords_string()) as $keyword)
@@ -37,6 +38,7 @@ class common_keyword_bind extends base_page_db
 				'target_create_time' => $object->create_time(),
 				'target_modify_time' => $object->modify_time(),
 				'target_owner_id' => $object->owner_id(),
+				'was_auto' => $was_auto,
 			));
 		}
 	}
