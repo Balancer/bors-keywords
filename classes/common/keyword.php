@@ -1,11 +1,11 @@
 <?php
 
 require_once('classes/inc/text/Stem_ru-'.config('internal_charset').'.php');
-	
+
 class common_keyword extends base_page_db
 {
 	function main_db(){ return config('main_bors_db'); }
-	function main_table(){ return 'keywords'; }
+	function main_table(){ return 'bors_keywords'; }
 
     function main_table_fields()
 	{
@@ -29,7 +29,7 @@ class common_keyword extends base_page_db
 				$keywords[] = $Stemmer->stem_word($word);
 
 		sort($keywords);
-		
+
 		return join(' ', $keywords);
 	}
 
@@ -45,7 +45,7 @@ class common_keyword extends base_page_db
 				'targets_count' => 0,
 			));
 		}
-		
+
 		return $x;
 	}
 
