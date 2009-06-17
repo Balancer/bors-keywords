@@ -35,6 +35,7 @@ class common_keyword_bind extends base_page_db
 
 			$new_bind = object_new_instance('common_keyword_bind', array('keyword_id' => $key->id(),
 				'target_class_id' => $object->class_id(),
+				'target_class_name' => $object->extends_class(),
 				'target_object_id' => $object->id(),
 				'target_create_time' => $object->create_time(),
 				'target_modify_time' => $object->modify_time(),
