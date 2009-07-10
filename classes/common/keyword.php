@@ -24,7 +24,7 @@ class common_keyword extends base_page_db
 		$keywords = array();
 		$Stemmer = &new Lingua_Stem_Ru();
 
-		foreach(explode(' ', strtolower($words)) as $word)
+		foreach(explode(' ', bors_lower($words)) as $word)
 			if($word)
 				$keywords[] = $Stemmer->stem_word($word);
 
