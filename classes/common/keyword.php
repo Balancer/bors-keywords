@@ -16,6 +16,8 @@ class common_keyword extends base_page_db
 			'keyword_original',
 			'modify_time',
 			'targets_count',
+			'description',
+			'synonym_to_id' => 'synonym_to',
 		);
 	}
 
