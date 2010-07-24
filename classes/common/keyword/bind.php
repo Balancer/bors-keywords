@@ -16,6 +16,7 @@ class common_keyword_bind extends base_page_db
 			'target_create_time',
 			'target_modify_time',
 			'target_owner_id',
+			'target_forum_id',
 			'sort_order',
 		);
 	}
@@ -48,10 +49,25 @@ class common_keyword_bind extends base_page_db
 				'target_create_time' => $object->create_time(),
 				'target_modify_time' => $object->modify_time(),
 				'target_owner_id' => $object->owner_id(),
+				'target_forum_id' => object_property($object, 'forum_id'),
 				'was_auto' => $was_auto,
 			));
 		}
 	}
 
-	function object() { return object_load($this->target_class_id(), $this->target_object_id()); }
+	function auto_objects()
+	{
+		return array(
+			'target_forum' => 'balancer_board_forum(target_forum_id)',
+		);
+	}
+
+	function auto_targets()
+	{
+		return array(
+			'target' => 'target_class_id(target_object_id)',
+		);
+	}
+
+//	function object() { return object_load($this->target_class_id(), $this->target_object_id()); }
 }

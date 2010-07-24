@@ -52,4 +52,70 @@ class common_keyword extends base_page_db
 	}
 
 	function url() { return 'http://forums.balancer.ru/tags/'.trim($this->title()).'/'; }
+
+	static function keyword_search_reindex($kw)
+	{
+		require_once('inc/search/sphinx.php');
+
+		$xs = bors_search_sphinx($kw, array(
+			'indexes' => 'topics',
+			'only_objects' => true,
+			'page' => 1,
+			'per_page' => 10,
+			'persistent_instance' => true,
+			'exactly' => true,
+			'filter' => array('forum_id<>' => array(37)),
+		));
+
+		if(!is_array($xs))
+			return;
+
+		foreach($xs as $x)
+		{
+			if(in_array($kw, $x->keywords()))
+				continue;
+
+			$x->add_keyword($kw, true);
+			common_keyword_bind::add($x);
+		}
+
+		bors()->changed_save();
+	}
+
+	static function best_forum($keywords_string)
+	{
+		$forum_id = 12;
+
+		$fids = array();
+		foreach(explode(',', $keywords_string) as $tag)
+		{
+			common_keyword::keyword_search_reindex($tag);
+			$kw = common_keyword::loader($tag);
+
+//			echo ">>>$tag -> {$kw->title()}\n";
+
+			$kwbs = objects_array('common_keyword_bind', array(
+				'keyword_id' => $kw->id(),
+				'group' => 'target_forum_id',
+				'order' => 'count(*) DESC',
+				'select' => array('COUNT(*) AS total'),
+				'limit' => 10,
+			));
+
+			foreach($kwbs as $kwb)
+			{
+//				echo "$tag [{$kwb->target_forum()->debug_title()}]: {$kwb->total()}\n";
+				@$fids[$kwb->target_forum_id()] += sqrt($kwb->total());
+			}
+		}
+
+		asort($fids);
+
+//		print_d($fids);
+
+		if($fids)
+			$forum_id = array_pop(array_keys($fids));
+
+		return $forum_id;
+	}
 }
