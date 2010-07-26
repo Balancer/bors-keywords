@@ -118,4 +118,44 @@ class common_keyword extends base_page_db
 
 		return $forum_id;
 	}
+
+	static function best_topic($keywords_string, $topic_id)
+	{
+		$ids = array();
+		foreach(explode(',', $keywords_string) as $tag)
+		{
+			common_keyword::keyword_search_reindex($tag);
+			$kw = common_keyword::loader($tag);
+
+			$kwbs = objects_array('common_keyword_bind', array(
+				'keyword_id' => $kw->id(),
+				'target_container_class_name' => 'balancer_board_topic',
+				'group' => 'target_container_object_id',
+				'order' => 'count(*) DESC',
+				'select' => array('COUNT(*) AS total'),
+				'limit' => 20,
+			));
+
+			foreach($kwbs as $kwb)
+			{
+				$topic = object_load('balancer_board_topic', $kwb->target_container_object_id());
+				echo "$tag [{$kwb->total()}, ".round(sqrt($kwb->total()), 1).", ".round(log($kwb->total())+1, 1)."]: {$topic->debug_title()}\n";
+				@$ids[$kwb->target_container_object_id()] += log($kwb->total())+1;
+			}
+		}
+
+		asort($ids);
+
+		echo "\n=== sorted result: ===\n";
+		foreach($ids as $id => $count)
+		{
+			$topic = object_load('balancer_board_topic', $id);
+			echo "{$topic->debug_title()}: $count\n";
+		}
+
+		if($ids)
+			$topic_id = array_pop(array_keys($ids));
+
+		return $topic_id;
+	}
 }

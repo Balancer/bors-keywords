@@ -17,6 +17,9 @@ class common_keyword_bind extends base_page_db
 			'target_modify_time',
 			'target_owner_id',
 			'target_forum_id',
+			'target_container_class_name',
+			'target_container_class_id',
+			'target_container_object_id',
 			'sort_order',
 		);
 	}
@@ -35,6 +38,20 @@ class common_keyword_bind extends base_page_db
 
 		$db->delete('bors_keywords_index', $where);
 
+		$container = object_property($object, 'container');
+		if($container)
+		{
+			$target_container_class_name = $container->class_name();
+			$target_container_class_id = $container->class_id();
+			$target_container_object_id = $container->id();
+		}
+		else
+		{
+			$target_container_class_name = NULL;
+			$target_container_class_id = NULL;
+			$target_container_object_id = NULL;
+		}
+
 		foreach(explode(',', $object->keywords_string()) as $keyword)
 		{
 			$key = common_keyword::loader($keyword);
@@ -51,6 +68,9 @@ class common_keyword_bind extends base_page_db
 				'target_owner_id' => $object->owner_id(),
 				'target_forum_id' => object_property($object, 'forum_id'),
 				'was_auto' => $was_auto,
+				'target_container_class_name' => $target_container_class_name,
+				'target_container_class_id' => $target_container_class_id,
+				'target_container_object_id' => $target_container_object_id,
 			));
 		}
 	}
