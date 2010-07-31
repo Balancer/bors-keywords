@@ -90,7 +90,7 @@ class common_keyword extends base_page_db
 
 			if(stripos($x->title(), $kw) !== false || stripos($x->description(), $kw) !== false)
 			{
-				echo "Add tag $kw to {$x->debug_title()}, kw={$x->keywords_string()}\n";
+//				echo "Add tag $kw to {$x->debug_title()}, kw={$x->keywords_string()}\n";
 				$x->add_keyword($kw, true);
 				common_keyword_bind::add($x);
 				$count++;
@@ -190,13 +190,15 @@ class common_keyword extends base_page_db
 		foreach(objects_array('common_keyword_bind', array('keyword_id' => $this->id())) as $bind)
 		{
 			$obj = $bind->target();
-			echo "{$obj->debug_title()}: change {$this->title()} to {$syn->title()}\n";
+//			echo "{$obj->debug_title()}: change {$this->title()} to {$syn->title()}\n";
 			$obj->remove_keyword($this->title(), true);
 			$obj->add_keyword($syn->title(), true);
 		}
 
 		bors()->changed_save();
-		echo $this->set_targets_count(objects_count('common_keyword_bind', array('keyword_id' => $this->id())), true);
-		echo $syn->set_targets_count(objects_count('common_keyword_bind', array('keyword_id' => $syn->id())), true);
+		$this->set_targets_count(objects_count('common_keyword_bind', array('keyword_id' => $this->id())), true);
+		$count = $syn->set_targets_count(objects_count('common_keyword_bind', array('keyword_id' => $syn->id())), true);
+
+		return $count;
 	}
 }
