@@ -21,6 +21,7 @@ class common_keyword_bind extends base_page_db
 			'target_container_class_id',
 			'target_container_object_id',
 			'sort_order',
+			'was_auto',
 		);
 	}
 
