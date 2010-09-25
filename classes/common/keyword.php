@@ -37,7 +37,7 @@ class common_keyword extends base_page_db
 
 	static function loader($words)
 	{
-		$keyword = common_keyword::normalize($words);
+		$keyword = common_keyword::normalize(trim($words));
 		$x = objects_first('common_keyword', array('keyword' => $keyword));
 		if(!$x)
 		{
