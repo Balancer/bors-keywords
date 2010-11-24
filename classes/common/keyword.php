@@ -26,9 +26,9 @@ class common_keyword extends base_page_db
 		$keywords = array();
 		$Stemmer = new Lingua_Stem_Ru();
 
-		foreach(explode(' ', bors_lower($words)) as $word)
-			if($word)
-				$keywords[] = $Stemmer->stem_word($word);
+		$words = array_filter(explode(' ', bors_lower($words)));
+		foreach($words as $word)
+			$keywords[] = $Stemmer->stem_word($word);
 
 		sort($keywords);
 
