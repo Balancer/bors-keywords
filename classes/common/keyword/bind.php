@@ -79,6 +79,7 @@ class common_keyword_bind extends base_page_db
 	function auto_objects()
 	{
 		return array(
+			'keyword' => 'common_keyword(keyword_id)',
 			'target_forum' => 'balancer_board_forum(target_forum_id)',
 		);
 	}
