@@ -214,4 +214,16 @@ class common_keyword extends base_page_db
 		}
 		return join(', ', $result);
 	}
+
+	static function all($object)
+	{
+		$bindings = bors_find_all('common_keyword_bind', array(
+			'target_class_id' => $object->class_id(),
+			'target_object_id' => $object->id(),
+		));
+
+		$keyword_ids = bors_field_array_extract($bindings, 'keyword_id');
+		$keywords = bors_find_all(__CLASS__, array('id IN' => $keyword_ids));
+		return bors_field_array_extract($keywords, 'title');
+	}
 }
