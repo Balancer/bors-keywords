@@ -86,9 +86,9 @@ class common_keyword_bind extends base_page_db
 
 	function auto_targets()
 	{
-		return array(
+		return array_merge(parent::auto_targets(), array(
 			'target' => 'target_class_id(target_object_id)',
-		);
+		));
 	}
 
 //	function object() { return object_load($this->target_class_id(), $this->target_object_id()); }
