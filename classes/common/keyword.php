@@ -4,6 +4,7 @@ require_once('classes/inc/text/Stem_ru-'.config('internal_charset').'.php');
 
 class common_keyword extends base_page_db
 {
+
 	function main_db(){ return config('main_bors_db'); }
 	function main_table(){ return 'bors_keywords'; }
 
@@ -21,23 +22,33 @@ class common_keyword extends base_page_db
 		);
 	}
 
-	static function normalize($words)
+	static function normalize($words, $sort = false)
 	{
 		$keywords = array();
 		$Stemmer = new Lingua_Stem_Ru();
 
-		$words = array_filter(explode(' ', bors_lower($words)));
-		foreach($words as $word)
-			$keywords[] = $Stemmer->stem_word($word);
+		$words = preg_replace('/[^\wа-яА-ЯёЁ\-]+/u', ' ', $words);
 
-		sort($keywords);
+		$words = array_filter(explode(' ', $words));
+		foreach($words as $word)
+		{
+			if(preg_match('/[a-zа-яё]/u', $word) || strlen($word) < 3)
+				// если есть строчные буквы или слово коротке- то нормируем
+				$keywords[] = $Stemmer->stem_word($word);
+			else
+				// если все прописные - оставляем как есть, это аббревиатура
+				$keywords[] = $word;
+		}
+
+		if($sort)
+			sort($keywords);
 
 		return join(' ', $keywords);
 	}
 
 	static function loader($words)
 	{
-		$keyword = common_keyword::normalize(trim($words));
+		$keyword = common_keyword::normalize(trim($words), true);
 		$x = objects_first('common_keyword', array('keyword' => $keyword));
 		if(!$x)
 		{
@@ -48,12 +59,14 @@ class common_keyword extends base_page_db
 			));
 		}
 
+		$x->set_attr('keyword_normalized', $keyword);
+
 		return $x;
 	}
 
 	function url() { return config('tags_root_url', 'http://forums.balancer.ru/tags').'/'.trim($this->title()).'/'; }
 
-	static function keyword_search_reindex($kw)
+	static function keyword_search_reindex($kw, $set = false)
 	{
 		$count = 0;
 		require_once('inc/search/sphinx.php');
@@ -77,8 +90,17 @@ class common_keyword extends base_page_db
 
 		foreach($xs as $x)
 		{
+//			echo "Test {$x->debug_title()} for {$x->keywords_string()}\n";
 			if(in_array($kw, $x->keywords()))
+			{
+				if($set)
+				{
+					common_keyword_bind::add($x);
+					$count++;
+				}
+
 				continue;
+			}
 
 			if($ucase && strpos($x->title(), $kw) === false && strpos($x->description(), $kw) === false)
 			{
@@ -102,14 +124,12 @@ class common_keyword extends base_page_db
 		return $count;
 	}
 
-	static function best_forum($keywords_string)
+	static function best_forum($keywords_string, $forum_id = 12)
 	{
-		$forum_id = 12;
-
 		$fids = array();
 		foreach(explode(',', $keywords_string) as $tag)
 		{
-			common_keyword::keyword_search_reindex($tag);
+			common_keyword::keyword_search_reindex($tag, true);
 			$kw = common_keyword::loader($tag);
 
 //			echo ">>>$tag -> {$kw->title()}\n";
@@ -139,28 +159,51 @@ class common_keyword extends base_page_db
 		return $forum_id;
 	}
 
-	static function best_topic($keywords_string, $topic_id)
+	static function best_topic($keywords_string, $topic_id, $is_debug = false)
 	{
 		$ids = array();
 		foreach(explode(',', $keywords_string) as $tag)
 		{
-			common_keyword::keyword_search_reindex($tag);
+			if($is_debug) echo "======================\nFind topics for $tag\n----------------------\n";
+			common_keyword::keyword_search_reindex($tag, true);
 			$kw = common_keyword::loader($tag);
-
-			$kwbs = objects_array('common_keyword_bind', array(
+			$kw_norm = $kw->keyword_normalized();
+			if($is_debug) echo "Find for {$kw->debug_title()} [{$kw_norm}]\n";
+			$bindings = bors_find_all('common_keyword_bind', array(
 				'keyword_id' => $kw->id(),
-				'target_container_class_name' => 'balancer_board_topic',
+				'target_container_class_name IN' => array('balancer_board_topic', 'forum_topic'),
 				'group' => 'target_container_object_id',
 				'order' => 'count(*) DESC',
-				'select' => array('COUNT(*) AS total'),
-				'limit' => 20,
+				'*set' => 'COUNT(*) AS items_count',
+				'limit' => 50,
 			));
 
-			foreach($kwbs as $kwb)
+			$bindings_total = count($bindings);
+
+			if($is_debug) echo "bindings total=$bindings_total\n";
+			foreach($bindings as $bind)
 			{
-				$topic = object_load('balancer_board_topic', $kwb->target_container_object_id());
-//				echo "$tag [{$kwb->total()}, ".round(sqrt($kwb->total()), 1).", ".round(log($kwb->total())+1, 1)."]: {$topic->debug_title()}\n";
-				@$ids[$kwb->target_container_object_id()] += sqrt($kwb->total());
+				$topic  = $bind->container_or_target();
+				$target = $bind->target();
+				if(!$topic)
+				{
+					if($is_debug) echo " *** Unknown container for bind {$bind->id()} (target=".object_property($target, 'debug_title').")\n";
+					debug_hidden_log('keywords_index_error', "Unknown target or container for bind {$bind->id()}");
+					continue;
+				}
+
+				$in_title = 10;
+				if(!self::object_keywords_check($topic, $kw_norm, true, $is_debug))
+				{
+					$in_title = 5;
+					if(!self::object_keywords_check($target, $kw_norm, true, $is_debug))
+						continue;
+				}
+
+				$weight = $in_title * sqrt($bind->items_count()) / ($bindings_total+1);
+				if($is_debug) echo "Found $tag in {$target->debug_title()}/{$topic->debug_title()} w={$weight}, it={$in_title}, c={$bind->items_count()}\n";
+
+				@$ids[$bind->target_container_object_id()] += $weight;
 			}
 		}
 
@@ -179,7 +222,36 @@ class common_keyword extends base_page_db
 		return $topic_id;
 	}
 
-	static function compare_eq($kws1, $kws2) { return self::normalize($kws1) == self::normalize($kws2); }
+	static function object_keywords_check($object, $keyword_norm, $rebind = true, $is_debug = false)
+	{
+		if(!$object)
+			return false;
+
+		$object_keywords_norm = array();
+		foreach($object->keywords() as $k)
+			$object_keywords_norm[] = self::normalize($k);
+
+		if(in_array($keyword_norm, $object_keywords_norm))
+			return true;
+
+		foreach($object->keywords() as $k)
+			if(strcasecmp($k, $keyword_norm) == 0)
+				return true;
+
+		if(!$rebind)
+		{
+			if($is_debug) echo " *** Not exists keyword '$keyword_norm' in '".join(',', $object_keywords_norm)."'\n";
+			debug_hidden_log('keywords_index_error', "Not exists keyword '$keyword_norm' in '".join(',', $object_keywords_norm)."'");
+			return false;
+		}
+
+		if($is_debug) echo " *** Not exists keyword '$keyword_norm' in '".join(',', $object_keywords_norm)."'. Try rebind\n";
+		common_keyword_bind::add($object);
+
+		return self::object_keywords_check($object, $keyword_norm, false, $is_debug);
+	}
+
+	static function compare_eq($kws1, $kws2) { return self::normalize($kws1, true) == self::normalize($kws2, true); }
 
 	function change_synonym()
 	{
@@ -202,17 +274,25 @@ class common_keyword extends base_page_db
 		return $count;
 	}
 
-	static function linkify($keywords, $base_keywords = '')
+	static function linkify($keywords, $base_keywords = '', $join_char = ', ', $no_style = false)
 	{
+		$base = config('tags_root_url', 'http://forums.balancer.ru/tags');
 		$result = array();
 		foreach($keywords as $key)
 		{
-			$k = self::loader($key);
-			$result[] = "<a style=\"font-size:".intval(10+sqrt($k->targets_count())/3)."px;\" href=\"".config('tags_root_url', 'http://forums.balancer.ru/tags')."/".
-				join("/", array_map('urlencode', explode(',', $key.','.$base_keywords)))
-			."/\">".trim($key)."</a>";
+			$kws = array_map('urlencode', array_filter(explode(',', $key.','.$base_keywords)));
+			$kws = join("/", $kws);
+			if($no_style)
+				$result[] = "<a href=\"{$base}/{$kws}/\">".trim($key)."</a>";
+			else
+			{
+				$k = self::loader($key);
+				$result[] = "<a style=\"font-size:".intval(10+sqrt($k->targets_count())/3)."px;\" href=\"{$base}/"
+					.$kws."/\">".trim($key)."</a>";
+			}
 		}
-		return join(', ', $result);
+
+		return join($join_char, $result);
 	}
 
 	static function all($object)
