@@ -124,7 +124,7 @@ class common_keyword extends base_page_db
 		return $count;
 	}
 
-	static function best_forum($keywords_string, $forum_id = 12)
+	static function best_forum($keywords_string, $forum_id = 12, $is_debug = false)
 	{
 		$fids = array();
 		foreach(explode(',', $keywords_string) as $tag)
@@ -134,18 +134,21 @@ class common_keyword extends base_page_db
 
 //			echo ">>>$tag -> {$kw->title()}\n";
 
-			$kwbs = objects_array('common_keyword_bind', array(
+			$bindings = objects_array('common_keyword_bind', array(
 				'keyword_id' => $kw->id(),
 				'group' => 'target_forum_id',
 				'order' => 'count(*) DESC',
-				'select' => array('COUNT(*) AS total'),
+				'*set' => 'COUNT(*) AS total',
 				'limit' => 10,
 			));
 
-			foreach($kwbs as $kwb)
+			$bindings_total = count($bindings);
+
+			foreach($bindings as $bind)
 			{
-//				echo "$tag [{$kwb->target_forum()->debug_title()}]: {$kwb->total()}\n";
-				@$fids[$kwb->target_forum_id()] += sqrt($kwb->total());
+				$weight = sqrt($bind->total()) / ($bindings_total+1);
+//				if($is_debug) echo "$tag [{$bind->target_forum()->debug_title()}]: {$bind->total()}\n";
+				@$fids[$bind->target_forum_id()] += sqrt($bind->total());
 			}
 		}
 
