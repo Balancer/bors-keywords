@@ -32,7 +32,7 @@ class common_keyword_bind extends base_page_db
 		$db = new driver_mysql(config('main_bors_db'));
 
 		$where = array(
-			'target_class_id' => $object->class_id(),
+			'target_class_id IN' => array($object->class_id(), $object->extends_class_id()),
 			'target_object_id' => $object->id(),
 		);
 
@@ -55,15 +55,16 @@ class common_keyword_bind extends base_page_db
 			$target_container_object_id = $object->id();
 		}
 
-		foreach(explode(',', $object->keywords_string()) as $keyword)
+		$keyword_string = $object->get('keywords_string');
+		if(!$keyword_string)
+			return;
+
+		foreach(explode(',', $keyword_string) as $keyword)
 		{
 			$key = common_keyword::loader($keyword);
 
 			$key->set_modify_time(time(), true);
 			$key->set_targets_count(1 + $key->targets_count(), true);
-
-//			if($keyword == 'PHP')
-//				echo "common_keyword_bind::add({$object->debug_title()}) = $keyword\n";
 
 			$new_bind = object_new_instance(__CLASS__, array('keyword_id' => $key->id(),
 				'target_class_id' => $object->extends_class_id(),
