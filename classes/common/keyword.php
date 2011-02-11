@@ -277,9 +277,9 @@ class common_keyword extends base_page_db
 		return $count;
 	}
 
-	static function linkify($keywords, $base_keywords = '', $join_char = ', ', $no_style = false)
+	static function linkify($keywords, $base_keywords = '', $join_char = ', ', $no_style = false, $base = 'http://forums.balancer.ru/tags')
 	{
-		$base = config('tags_root_url', 'http://forums.balancer.ru/tags');
+		$base = config('tags_root_url', $base);
 		$result = array();
 		foreach($keywords as $key)
 		{
