@@ -298,6 +298,7 @@ class common_keyword extends base_page_db
 		return join($join_char, $result);
 	}
 
+	// Возвращает _текстовые_ тэги в виде массива для указанного объекта
 	static function all($object)
 	{
 		$bindings = bors_find_all('common_keyword_bind', array(
@@ -308,5 +309,35 @@ class common_keyword extends base_page_db
 		$keyword_ids = bors_field_array_extract($bindings, 'keyword_id');
 		$keywords = bors_find_all(__CLASS__, array('id IN' => $keyword_ids));
 		return bors_field_array_extract($keywords, 'title');
+	}
+
+	// Возвращает все объекты, привязанные к данному тэгу
+	static function find_all_objects($tag, $where = array())
+	{
+		$data = array(
+			'keyword_id' => $tag->id(),
+		);
+
+		$bindings = bors_find_all('common_keyword_bind', array_merge($data, $where));
+		return bors_field_array_extract($bindings, 'target');
+	}
+
+	// Возвращает id всех объектов, привязанные к данному тэгу
+	static function find_all_object_ids($tag, $where = array())
+	{
+		$data = array(
+			'keyword_id' => $tag->id(),
+		);
+
+		$bindings = bors_find_all('common_keyword_bind', array_merge($data, $where));
+		return bors_field_array_extract($bindings, 'target_object_id');
+	}
+
+	function synonym()
+	{
+		if(!$this->synonym_to_id())
+			return NULL;
+
+		return bors_load(__CLASS__, $this->synonym_to_id());
 	}
 }
