@@ -340,4 +340,9 @@ class common_keyword extends base_page_db
 
 		return bors_load(__CLASS__, $this->synonym_to_id());
 	}
+
+	static function add($object, $was_auto = false)
+	{
+		return common_keyword_bind::add($object, $was_auto);
+	}
 }
