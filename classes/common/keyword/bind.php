@@ -29,7 +29,7 @@ class common_keyword_bind extends base_page_db
 		);
 	}
 
-	static function add($object, $was_auto = false)
+	static function add($object, $was_auto = false, $append=NULL)
 	{
 		$db = new driver_mysql(config('main_bors_db'));
 
@@ -41,7 +41,8 @@ class common_keyword_bind extends base_page_db
 		if($was_auto) // Если это автоматическое добавление, то чистим тоже только автоматические.
 			$where['was_auto'] = true;
 
-		$db->delete('bors_keywords_index', $where);
+		if(!$append) // Чистим только если это не регистрация отдельного слова
+			$db->delete('bors_keywords_index', $where);
 
 		$container = object_property($object, 'container');
 		if($container)
@@ -57,7 +58,11 @@ class common_keyword_bind extends base_page_db
 			$target_container_object_id = $object->id();
 		}
 
-		$keyword_string = $object->get('keywords_string');
+		if($append)
+			$keyword_string = $append;
+		else
+			$keyword_string = $object->get('keywords_string');
+
 		if(!$keyword_string)
 			return;
 

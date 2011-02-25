@@ -334,13 +334,27 @@ class common_keyword extends base_page_db
 	}
 
 	// Возвращает количество всех объектов, привязанные к данному тэгу
-	static function targets_count($tag, $where = array())
+	static function tag_targets_count($tag, $where = array())
 	{
 		$data = array(
-			'keyword_id' => $tag->id(),
+			'keyword_id' => object_property($tag, 'id'),
 		);
 
 		return objects_count('common_keyword_bind', array_merge($data, $where));
+	}
+
+	// Возвращает все тэги, привязанные к данному объекту
+	static function find_all_tags_string($object, $where = array())
+	{
+		$data = array(
+			'target_class_id IN' => array($object->extends_class_id(), $object->class_id()),
+			'target_object_id' => $object->id(),
+		);
+
+		$bindings = bors_find_all('common_keyword_bind', array_merge($data, $where));
+		$tag_ids = bors_field_array_extract($bindings, 'keyword_id');
+		$tags = bors_find_all(__CLASS__, array('id IN' => $tag_ids));
+		return join(', ', bors_field_array_extract($tags, 'title'));
 	}
 
 	function synonym()
@@ -351,8 +365,8 @@ class common_keyword extends base_page_db
 		return bors_load(__CLASS__, $this->synonym_to_id());
 	}
 
-	static function add($object, $was_auto = false)
+	static function add($object, $was_auto = false, $tag = NULL)
 	{
-		return common_keyword_bind::add($object, $was_auto);
+		return common_keyword_bind::add($object, $was_auto, $tag);
 	}
 }
