@@ -333,6 +333,16 @@ class common_keyword extends base_page_db
 		return bors_field_array_extract($bindings, 'target_object_id');
 	}
 
+	// Возвращает количество всех объектов, привязанные к данному тэгу
+	static function targets_count($tag, $where = array())
+	{
+		$data = array(
+			'keyword_id' => $tag->id(),
+		);
+
+		return objects_count('common_keyword_bind', array_merge($data, $where));
+	}
+
 	function synonym()
 	{
 		if(!$this->synonym_to_id())
