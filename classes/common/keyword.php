@@ -15,10 +15,16 @@ class common_keyword extends base_page_db
 			'keyword',
 			'title' => 'keyword_original',
 			'keyword_original',
+			'keyword_forms',
 			'modify_time',
 			'targets_count',
+			'target_containers_count',
 			'description',
 			'synonym_to_id' => 'synonym_to',
+			'tree_map',
+			'is_autosearch_original',
+			'is_autosearch_normalized',
+			'is_moderated',
 		);
 	}
 
@@ -162,7 +168,7 @@ class common_keyword extends base_page_db
 		return $forum_id;
 	}
 
-	static function best_topic($keywords_string, $topic_id, $is_debug = false)
+	static function best_topic($keywords_string, $topic_id, $is_debug = false, $limit = false, $weight_limit = false, $skip_tids = array())
 	{
 		$ids = array();
 		foreach(explode(',', $keywords_string) as $tag)
@@ -175,6 +181,7 @@ class common_keyword extends base_page_db
 			$bindings = bors_find_all('common_keyword_bind', array(
 				'keyword_id' => $kw->id(),
 				'target_container_class_name IN' => array('balancer_board_topic', 'forum_topic'),
+				'target_container_object_id NOT IN' => $skip_tids,
 				'group' => 'target_container_object_id',
 				'order' => 'count(*) DESC',
 				'*set' => 'COUNT(*) AS items_count',
@@ -220,7 +227,20 @@ class common_keyword extends base_page_db
 		}
 */
 		if($ids)
-			$topic_id = array_pop(array_keys($ids));
+		{
+			if($limit)
+			{
+				if($is_debug)
+					var_dump(array_slice(array_reverse($ids), 0, $limit));
+
+				if($weight_limit)
+					$ids = array_filter($ids, create_function('$x', 'return $x>'.str_replace(',','.',$weight_limit.';')));
+
+				$topic_id = array_slice(array_reverse(array_keys($ids)), 0, $limit);
+			}
+			else
+				$topic_id = array_pop(array_keys($ids));
+		}
 
 		return $topic_id;
 	}
@@ -243,7 +263,7 @@ class common_keyword extends base_page_db
 
 		if(!$rebind)
 		{
-			if($is_debug) echo " *** Not exists keyword '$keyword_norm' in '".join(',', $object_keywords_norm)."'\n";
+			if($is_debug) echo " *** Not exists keyword '$keyword_norm' in keywords '".join(',', $object_keywords_norm)."' for object {$object->debug_title()}\n";
 			debug_hidden_log('keywords_index_error', "Not exists keyword '$keyword_norm' in '".join(',', $object_keywords_norm)."'");
 			return false;
 		}
