@@ -174,7 +174,10 @@ class common_keyword extends base_page_db
 		foreach(explode(',', $keywords_string) as $tag)
 		{
 			if($is_debug) echo "======================\nFind topics for $tag\n----------------------\n";
-			common_keyword::keyword_search_reindex($tag, true);
+
+			if(!$limit)
+				common_keyword::keyword_search_reindex($tag, true);
+
 			$kw = common_keyword::loader($tag);
 			$kw_norm = $kw->keyword_normalized();
 			if($is_debug) echo "Find for {$kw->debug_title()} [{$kw_norm}]\n";
@@ -190,6 +193,9 @@ class common_keyword extends base_page_db
 
 			$bindings_total = count($bindings);
 
+			bors_objects_targets_preload($bindings, 'target_container_class_name', 'target_container_object_id', 'container');
+			bors_objects_targets_preload($bindings, 'target_class_name', 'target_object_id', 'target');
+
 			if($is_debug) echo "bindings total=$bindings_total\n";
 			foreach($bindings as $bind)
 			{
@@ -203,11 +209,11 @@ class common_keyword extends base_page_db
 				}
 
 				$in_title = 10;
-				if(!self::object_keywords_check($topic, $kw_norm, true, $is_debug))
+				if(!$limit && !self::object_keywords_check($topic, $kw_norm, true, $is_debug))
 				{
 					$in_title = 5;
-					if(!self::object_keywords_check($target, $kw_norm, true, $is_debug))
-						continue;
+//					if(!self::object_keywords_check($target, $kw_norm, true, $is_debug))
+//						continue;
 				}
 
 				$weight = $in_title * sqrt($bind->items_count()) / ($bindings_total+1);
@@ -264,7 +270,7 @@ class common_keyword extends base_page_db
 		if(!$rebind)
 		{
 			if($is_debug) echo " *** Not exists keyword '$keyword_norm' in keywords '".join(',', $object_keywords_norm)."' for object {$object->debug_title()}\n";
-			debug_hidden_log('keywords_index_error', "Not exists keyword '$keyword_norm' in '".join(',', $object_keywords_norm)."'");
+//			debug_hidden_log('keywords_index_error', "Not exists keyword '$keyword_norm' in '".join(',', $object_keywords_norm)."'");
 			return false;
 		}
 
