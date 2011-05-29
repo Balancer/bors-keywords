@@ -1,0 +1,24 @@
+{$this->pages_links_nul()}
+
+<table class="btab w100p small">
+<tr>
+	<th>ID</th>
+	<th>тэг</th>
+	<th>число объектов</th>
+	<th>число контейнеров</th>
+	<th>синоним к</th>
+	<th>дата модификации</th>
+</tr>
+{foreach from=$items item="x"}
+<tr>
+	<td>{$x->id()}</td>
+	<td>{$x->admin()->imaged_titled_link()}</td>
+	<td>{$x->targets_count()}</td>
+	<td>{$x->target_containers_count()}</td>
+	<td>{$x->synonym()|get:'admin'|get:imaged_titled_link()}</td>
+	<td>{$x->modify_time()|date:'d.m.Y H:i'}</td>
+</tr>
+{/foreach}
+</table>
+
+{$this->pages_links_nul()}
