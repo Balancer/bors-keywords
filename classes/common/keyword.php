@@ -25,6 +25,8 @@ class common_keyword extends base_page_db
 			'is_autosearch_original',
 			'is_autosearch_normalized',
 			'is_moderated',
+
+			'modify_time',
 		);
 	}
 
