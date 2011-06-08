@@ -32,6 +32,7 @@ class common_keyword extends base_page_db
 
 	static function normalize($words, $sort = false)
 	{
+		$words = str_replace('_', ' ', $words);
 		$keywords = array();
 		$Stemmer = new Lingua_Stem_Ru();
 
@@ -57,10 +58,11 @@ class common_keyword extends base_page_db
 	static function loader($words)
 	{
 		$keyword = common_keyword::normalize(trim($words), true);
-		$x = objects_first('common_keyword', array('keyword' => $keyword));
+		$x = bors_find_first('common_keyword', array('keyword' => $keyword));
 		if(!$x)
 		{
-			$x = object_new_instance('common_keyword', array(
+			$x = bors_new('common_keyword', array(
+				'title' => $words,
 				'keyword' => $keyword,
 				'keyword_original' => $words,
 				'targets_count' => 0,
