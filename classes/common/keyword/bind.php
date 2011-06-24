@@ -47,13 +47,13 @@ class common_keyword_bind extends base_page_db
 		$container = object_property($object, 'container');
 		if($container)
 		{
-			$target_container_class_name = $container->extends_class();
+			$target_container_class_name = $container->extends_class_name();
 			$target_container_class_id = $container->extends_class_id();
 			$target_container_object_id = $container->id();
 		}
 		else
 		{
-			$target_container_class_name = $object->extends_class();
+			$target_container_class_name = $object->extends_class_name();
 			$target_container_class_id = $object->extends_class_id();
 			$target_container_object_id = $object->id();
 		}
@@ -75,7 +75,7 @@ class common_keyword_bind extends base_page_db
 
 			$new_bind = object_new_instance(__CLASS__, array('keyword_id' => $key->id(),
 				'target_class_id' => $object->extends_class_id(),
-				'target_class_name' => $object->extends_class(),
+				'target_class_name' => $object->extends_class_name(),
 				'target_object_id' => $object->id(),
 				'target_create_time' => $object->create_time(),
 				'target_modify_time' => $object->modify_time(),
