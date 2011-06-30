@@ -82,7 +82,7 @@ class common_keyword extends base_page_db
 		require_once('inc/search/sphinx.php');
 
 		$xs = bors_search_sphinx($kw, array(
-			'indexes' => 'topics',
+			'indexes' => 'topic_keywords',
 			'only_objects' => true,
 			'page' => 1,
 			'per_page' => 10,
@@ -177,14 +177,14 @@ class common_keyword extends base_page_db
 		$ids = array();
 		foreach(explode(',', $keywords_string) as $tag)
 		{
-			if($is_debug) echo "======================\nFind topics for $tag\n----------------------\n";
+			if($is_debug) echo "\t======================\n\tFind topics for $tag\n\t----------------------\n";
 
 			if(!$limit)
 				common_keyword::keyword_search_reindex($tag, true);
 
 			$kw = common_keyword::loader($tag);
 			$kw_norm = $kw->keyword_normalized();
-			if($is_debug) echo "Find for {$kw->debug_title()} [{$kw_norm}]\n";
+			if($is_debug) echo "\tFind for {$kw->debug_title()} [{$kw_norm}]\n";
 			$bindings = bors_find_all('common_keyword_bind', array(
 				'keyword_id' => $kw->id(),
 				'target_container_class_name IN' => array('balancer_board_topic', 'forum_topic'),
@@ -200,7 +200,8 @@ class common_keyword extends base_page_db
 			bors_objects_targets_preload($bindings, 'target_container_class_name', 'target_container_object_id', 'container');
 			bors_objects_targets_preload($bindings, 'target_class_name', 'target_object_id', 'target');
 
-			if($is_debug) echo "bindings total=$bindings_total\n";
+			if($is_debug) echo "\tbindings total=$bindings_total\n";
+			$count = 0;
 			foreach($bindings as $bind)
 			{
 				$topic  = $bind->container_or_target();
@@ -221,7 +222,14 @@ class common_keyword extends base_page_db
 				}
 
 				$weight = $in_title * sqrt($bind->items_count()) / ($bindings_total+1);
-				if($is_debug) echo "Found $tag in {$target->debug_title()}/{$topic->debug_title()} w={$weight}, it={$in_title}, c={$bind->items_count()}\n";
+//				$weight *= sqrt(sqrt());
+				if($is_debug && $count++<10)
+				{
+					 echo "\t\tFound $tag in {$target->debug_title()} [{$target->keywords_string()}]\n";
+					 if(!bors_eq($topic, $target))
+					 	echo "\t\t\tin {$topic->debug_title()} [{$target->keywords_string()}]\n";
+					 echo "\t\t\tw={$weight}, it={$in_title}, c={$bind->items_count()}\n";
+				}
 
 				@$ids[$bind->target_container_object_id()] += $weight;
 			}
@@ -252,6 +260,7 @@ class common_keyword extends base_page_db
 				$topic_id = array_pop(array_keys($ids));
 		}
 
+		$GLOBALS['__debug_last_topic_weight'] = $ids[$topic_id];
 		return $topic_id;
 	}
 
@@ -273,12 +282,12 @@ class common_keyword extends base_page_db
 
 		if(!$rebind)
 		{
-			if($is_debug) echo " *** Not exists keyword '$keyword_norm' in keywords '".join(',', $object_keywords_norm)."' for object {$object->debug_title()}\n";
+//			if($is_debug) echo " *** Not exists keyword '$keyword_norm' in keywords '".join(',', $object_keywords_norm)."' for object {$object->debug_title()}\n";
 //			debug_hidden_log('keywords_index_error', "Not exists keyword '$keyword_norm' in '".join(',', $object_keywords_norm)."'");
 			return false;
 		}
 
-		if($is_debug) echo " *** Not exists keyword '$keyword_norm' in '".join(',', $object_keywords_norm)."'. Try rebind\n";
+//		if($is_debug) echo " *** Not exists keyword '$keyword_norm' in '".join(',', $object_keywords_norm)."'. Try rebind\n";
 		common_keyword_bind::add($object);
 
 		return self::object_keywords_check($object, $keyword_norm, false, $is_debug);
