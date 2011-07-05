@@ -260,7 +260,7 @@ class common_keyword extends base_page_db
 				$topic_id = array_pop(array_keys($ids));
 		}
 
-		$GLOBALS['__debug_last_topic_weight'] = $ids[$topic_id];
+		$GLOBALS['__debug_last_topic_weight'] = @$ids[$topic_id];
 		return $topic_id;
 	}
 
