@@ -42,7 +42,10 @@ class common_keyword_bind extends base_page_db
 			$where['was_auto'] = true;
 
 		if(!$append) // Чистим только если это не регистрация отдельного слова
+		{
+			debug_hidden_log('__keywords_delete', 'where='.print_r($where, true));
 			$db->delete('bors_keywords_index', $where);
+		}
 
 		$container = object_property($object, 'container');
 		if($container)
@@ -117,4 +120,17 @@ class common_keyword_bind extends base_page_db
 	}
 
 //	function object() { return object_load($this->target_class_id(), $this->target_object_id()); }
+
+	static function remove($object)
+	{
+		$db = new driver_mysql(config('main_bors_db'));
+
+		$where = array(
+			'target_class_id IN' => array($object->class_id(), $object->extends_class_id()),
+			'target_object_id' => $object->id(),
+		);
+
+		debug_hidden_log('__keywords_delete', 'where='.print_r($where, true));
+		$db->delete('bors_keywords_index', $where);
+	}
 }

@@ -76,22 +76,23 @@ class common_keyword extends base_page_db
 
 	function url() { return config('tags_root_url', 'http://forums.balancer.ru/tags').'/'.trim($this->title()).'/'; }
 
-	static function keyword_search_reindex($kw, $set = false)
+	static function keyword_search_reindex($kw, $set = false, $in_titles = false, $morfology = false)
 	{
 		$count = 0;
 		require_once('inc/search/sphinx.php');
 
 		$xs = bors_search_sphinx($kw, array(
-			'indexes' => 'topic_keywords',
+			'indexes' => 'topic_keywords' . ($in_titles ? ',topic_titles' : ''),
 			'only_objects' => true,
-			'page' => 1,
-			'per_page' => 10,
+//			'page' => 1,
+//			'per_page' => 10,
 			'persistent_instance' => true,
 			'exactly' => true,
 			'filter' => array('forum_id<>' => array(37)),
 		));
 
-//		print_r($xs);
+//		print_dd($xs);
+//		exit();
 
 		if(!is_array($xs))
 			return 0;
@@ -120,9 +121,10 @@ class common_keyword extends base_page_db
 				continue;
 			}
 
-			if(stripos($x->title(), $kw) !== false || stripos($x->description(), $kw) !== false)
+			if($morfology || stripos($x->title(), $kw) !== false || stripos($x->description(), $kw) !== false)
 			{
-//				echo "Add tag $kw to {$x->debug_title()}, kw={$x->keywords_string()}\n";
+				echo "Add tag $kw to {$x->debug_title()}, kw={$x->keywords_string()}\n";
+//				if($in_titles) continue;
 				$x->add_keyword($kw, true);
 				common_keyword_bind::add($x);
 				$count++;
