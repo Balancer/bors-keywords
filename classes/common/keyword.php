@@ -312,8 +312,8 @@ class common_keyword extends base_page_db
 		}
 
 		bors()->changed_save();
-		$this->set_targets_count(objects_count('common_keyword_bind', array('keyword_id' => $this->id())), true);
-		$count = $syn->set_targets_count(objects_count('common_keyword_bind', array('keyword_id' => $syn->id())), true);
+		$this->set_targets_count(objects_count('common_keyword_bind', array('keyword_id' => $this->id())));
+		$count = $syn->set_targets_count(objects_count('common_keyword_bind', array('keyword_id' => $syn->id())));
 
 		return $count;
 	}
