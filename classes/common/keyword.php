@@ -69,7 +69,10 @@ class common_keyword extends base_page_db
 			));
 		}
 
-		$x->set_attr('keyword_normalized', $keyword);
+		if($x->synonym())
+			$x = $x->synonym();
+		else
+			$x->set_attr('keyword_normalized', $keyword);
 
 		return $x;
 	}
@@ -400,7 +403,7 @@ class common_keyword extends base_page_db
 
 	function synonym()
 	{
-		if(!$this->synonym_to_id())
+		if(!$this->get('synonym_to_id'))
 			return NULL;
 
 		return bors_load(__CLASS__, $this->synonym_to_id());
