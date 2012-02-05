@@ -4,7 +4,6 @@ require_once('classes/inc/text/Stem_ru-'.config('internal_charset').'.php');
 
 class common_keyword extends base_page_db
 {
-
 	function main_db(){ return config('main_bors_db'); }
 	function main_table(){ return 'bors_keywords'; }
 
@@ -188,7 +187,7 @@ class common_keyword extends base_page_db
 				common_keyword::keyword_search_reindex($tag, true);
 
 			$kw = common_keyword::loader($tag);
-			$kw_norm = $kw->keyword_normalized();
+			$kw_norm = $kw->keyword();
 			if($is_debug) echo "\tFind for {$kw->debug_title()} [{$kw_norm}]\n";
 			$bindings = bors_find_all('common_keyword_bind', array(
 				'keyword_id' => $kw->id(),
