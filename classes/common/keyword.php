@@ -324,7 +324,7 @@ class common_keyword extends base_page_db
 	{
 		$base = config('tags_root_url', $base);
 		$result = array();
-		foreach($keywords as $key)
+		foreach(array_filter($keywords) as $key)
 		{
 			$kws = array_map('urlencode', array_filter(explode(',', $key.','.$base_keywords)));
 			$kws = join("/", $kws);
