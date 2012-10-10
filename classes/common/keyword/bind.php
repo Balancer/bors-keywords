@@ -41,7 +41,11 @@ class common_keyword_bind extends base_page_db
 		if($was_auto) // Если это автоматическое добавление, то чистим тоже только автоматические.
 			$where['was_auto'] = true;
 		else
-			debug_hidden_log('__keywords_add', "{$object->debug_title()}: append=$append, where=".print_r($where, true));
+			debug_hidden_log('__keywords_add',
+				"{$object->debug_title()}: append=$append;"
+				." keyword_string={$object->get('keywords_string')};"
+				." where=".print_r($where, true)
+			);
 
 		if(!$append) // Чистим только если это не регистрация отдельного слова
 		{
@@ -78,7 +82,8 @@ class common_keyword_bind extends base_page_db
 			$key->set_modify_time(time(), true);
 			$key->set_targets_count(1 + $key->targets_count(), true);
 
-			$new_bind = object_new_instance(__CLASS__, array('keyword_id' => $key->id(),
+			$new_bind = object_new_instance(__CLASS__, array(
+				'keyword_id' => $key->id(),
 				'target_class_id' => $object->extends_class_id(),
 				'target_class_name' => $object->extends_class_name(),
 				'target_object_id' => $object->id(),
