@@ -252,8 +252,8 @@ class common_keyword extends bors_page_db
 		{
 			if($limit)
 			{
-				if($is_debug)
-					var_dump(array_slice(array_reverse($ids), 0, $limit));
+//				if($is_debug)
+//					var_dump(array_slice(array_reverse($ids), 0, $limit));
 
 				if($weight_limit)
 					$ids = array_filter($ids, create_function('$x', 'return $x>'.str_replace(',','.',$weight_limit.';')));
