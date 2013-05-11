@@ -2,7 +2,7 @@
 
 class bors_admin_tags_main extends bors_admin_paginated
 {
-	function title() { return ec('Редактор тэгов'); }
+	function title() { return ec('Редактор тегов'); }
 
 	function main_class() { return 'common_keyword'; }
 	function order() { return '-modify_time'; }

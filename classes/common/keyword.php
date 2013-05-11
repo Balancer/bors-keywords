@@ -99,7 +99,7 @@ class common_keyword extends bors_page_db
 		if(!is_array($xs))
 			return 0;
 
-		$ucase = ($kw == bors_upper($kw)); // тэг в верхнем регистре. Сокращение/аббревиатура.
+		$ucase = ($kw == bors_upper($kw)); // тег в верхнем регистре. Сокращение/аббревиатура.
 
 		foreach($xs as $x)
 		{
@@ -341,7 +341,7 @@ class common_keyword extends bors_page_db
 		return join($join_char, $result);
 	}
 
-	// Возвращает _текстовые_ тэги в виде массива для указанного объекта
+	// Возвращает _текстовые_ теги в виде массива для указанного объекта
 	static function all($object)
 	{
 		$bindings = bors_find_all('common_keyword_bind', array(
@@ -354,7 +354,7 @@ class common_keyword extends bors_page_db
 		return bors_field_array_extract($keywords, 'title');
 	}
 
-	// Возвращает все объекты, привязанные к данному тэгу
+	// Возвращает все объекты, привязанные к данному тегу
 	static function find_all_objects($tag, $where = array())
 	{
 		$data = array(
@@ -365,7 +365,7 @@ class common_keyword extends bors_page_db
 		return bors_field_array_extract($bindings, 'target');
 	}
 
-	// Возвращает id всех объектов, привязанные к данному тэгу
+	// Возвращает id всех объектов, привязанные к данному тегу
 	static function find_all_object_ids($tag, $where = array())
 	{
 		$data = array(
@@ -376,7 +376,7 @@ class common_keyword extends bors_page_db
 		return bors_field_array_extract($bindings, 'target_object_id');
 	}
 
-	// Возвращает количество всех объектов, привязанные к данному тэгу
+	// Возвращает количество всех объектов, привязанные к данному тегу
 	static function tag_targets_count($tag, $where = array())
 	{
 		$data = array(
@@ -386,7 +386,7 @@ class common_keyword extends bors_page_db
 		return objects_count('common_keyword_bind', array_merge($data, $where));
 	}
 
-	// Возвращает все тэги, привязанные к данному объекту
+	// Возвращает все теги, привязанные к данному объекту
 	static function find_all_tags_string($object, $where = array())
 	{
 		$data = array(
