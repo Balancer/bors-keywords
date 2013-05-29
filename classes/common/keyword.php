@@ -217,6 +217,9 @@ class common_keyword extends bors_page_db
 					continue;
 				}
 
+				if($topic->is_closed())
+					continue;
+
 				$in_title = 10;
 				if(!$limit && !self::object_keywords_check($topic, $kw_norm, true, $is_debug))
 				{
