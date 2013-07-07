@@ -76,7 +76,7 @@ class common_keyword extends bors_page_db
 		return $x;
 	}
 
-	function url($page=NULL) { return config('tags_root_url', 'http://forums.balancer.ru/tags').'/'.trim($this->title()).'/'; }
+	function url() { return config('tags_root_url', 'http://forums.balancer.ru/tags').'/'.trim($this->title()).'/'; }
 
 	static function keyword_search_reindex($kw, $set = false, $in_titles = false, $morfology = false)
 	{
