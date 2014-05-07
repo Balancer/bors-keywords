@@ -1,6 +1,6 @@
 <?php
 
-require_once('classes/inc/text/Stem_ru-'.config('internal_charset').'.php');
+require_once('classes/inc/text/Stem_ru.php');
 
 class common_keyword extends bors_page_db
 {
