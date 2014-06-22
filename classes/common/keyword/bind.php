@@ -104,10 +104,10 @@ class common_keyword_bind extends base_page_db
 
 	function auto_objects()
 	{
-		return array(
+		return array_merge(parent::auto_objects(), array(
 			'keyword' => 'common_keyword(keyword_id)',
 			'target_forum' => 'balancer_board_forum(target_forum_id)',
-		);
+		));
 	}
 
 	function auto_targets()
