@@ -49,7 +49,7 @@ class common_keyword_bind extends base_page_db
 
 		if(!$append) // Чистим только если это не регистрация отдельного слова
 		{
-			debug_hidden_log('__keywords_delete', "{$object->debug_title()}: auto=$was_auto, append=$append, where=".print_r($where, true));
+			debug_hidden_log('__keywords_delete_auto', "{$object->debug_title()}: auto=$was_auto, append=$append, where=".print_r($where, true));
 			$db->delete('bors_keywords_index', $where);
 		}
 
@@ -100,7 +100,7 @@ class common_keyword_bind extends base_page_db
 		}
 	}
 
-	function replace_on_new_instance() { return true; }
+	function ignore_on_new_instance() { return true; }
 
 	function auto_objects()
 	{
