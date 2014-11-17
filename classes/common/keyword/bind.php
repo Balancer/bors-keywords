@@ -41,15 +41,17 @@ class common_keyword_bind extends base_page_db
 		if($was_auto) // Если это автоматическое добавление, то чистим тоже только автоматические.
 			$where['was_auto'] = true;
 		else
+		{
 			debug_hidden_log('__keywords_add',
 				"{$object->debug_title()}: append=$append;"
 				." keyword_string={$object->get('keywords_string')};"
 				." where=".print_r($where, true)
 			);
+		}
 
 		if(!$append) // Чистим только если это не регистрация отдельного слова
 		{
-			debug_hidden_log('__keywords_delete_auto', "{$object->debug_title()}: auto=$was_auto, append=$append, where=".print_r($where, true));
+//			debug_hidden_log('__keywords_delete_auto', "{$object->debug_title()}: auto=$was_auto, append=$append, where=".print_r($where, true));
 			$db->delete('bors_keywords_index', $where);
 		}
 
