@@ -149,7 +149,7 @@ class common_keyword extends bors_page_db
 
 //			echo ">>>$tag -> {$kw->title()}\n";
 
-			$bindings = objects_array('common_keyword_bind', array(
+			$bindings = bors_find_all('common_keyword_bind', array(
 				'keyword_id' => $kw->id(),
 				'group' => 'target_forum_id',
 				'order' => 'count(*) DESC',
@@ -309,7 +309,7 @@ class common_keyword extends bors_page_db
 			return 0;
 
 		$syn = object_load('common_keyword', $this->synonym_to_id());
-		foreach(objects_array('common_keyword_bind', array('keyword_id' => $this->id())) as $bind)
+		foreach(bors_find_all('common_keyword_bind', array('keyword_id' => $this->id())) as $bind)
 		{
 			$obj = $bind->target();
 //			echo "{$obj->debug_title()}: change {$this->title()} to {$syn->title()}\n";
@@ -318,8 +318,8 @@ class common_keyword extends bors_page_db
 		}
 
 		bors()->changed_save();
-		$this->set_targets_count(objects_count('common_keyword_bind', array('keyword_id' => $this->id())));
-		$count = $syn->set_targets_count(objects_count('common_keyword_bind', array('keyword_id' => $syn->id())));
+		$this->set_targets_count(bors_count('common_keyword_bind', array('keyword_id' => $this->id())));
+		$count = $syn->set_targets_count(bors_count('common_keyword_bind', array('keyword_id' => $syn->id())));
 
 		return $count;
 	}
@@ -387,7 +387,7 @@ class common_keyword extends bors_page_db
 			'keyword_id' => object_property($tag, 'id'),
 		);
 
-		return objects_count('common_keyword_bind', array_merge($data, $where));
+		return bors_count('common_keyword_bind', array_merge($data, $where));
 	}
 
 	// Возвращает все теги, привязанные к данному объекту
