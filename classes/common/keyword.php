@@ -214,7 +214,7 @@ class common_keyword extends bors_page_db
 				if(!$topic)
 				{
 					if($is_debug) echo " *** Unknown container for bind {$bind->id()} (target=".object_property($target, 'debug_title').")\n";
-					debug_hidden_log('keywords_index_error', "Unknown target or container for bind {$bind->id()}");
+					bors_debug::syslog('keywords_index_error', "Unknown target or container for bind {$bind->id()}");
 					continue;
 				}
 
@@ -291,7 +291,7 @@ class common_keyword extends bors_page_db
 		if(!$rebind)
 		{
 //			if($is_debug) echo " *** Not exists keyword '$keyword_norm' in keywords '".join(',', $object_keywords_norm)."' for object {$object->debug_title()}\n";
-//			debug_hidden_log('keywords_index_error', "Not exists keyword '$keyword_norm' in '".join(',', $object_keywords_norm)."'");
+//			bors_debug::syslog('keywords_index_error', "Not exists keyword '$keyword_norm' in '".join(',', $object_keywords_norm)."'");
 			return false;
 		}
 

@@ -42,7 +42,7 @@ class common_keyword_bind extends base_page_db
 			$where['was_auto'] = true;
 		else
 		{
-			debug_hidden_log('__keywords_add',
+			bors_debug::syslog('__keywords_add',
 				"{$object->debug_title()}: append=$append;"
 				." keyword_string={$object->get('keywords_string')};"
 				." where=".print_r($where, true)
@@ -51,7 +51,7 @@ class common_keyword_bind extends base_page_db
 
 		if(!$append) // Чистим только если это не регистрация отдельного слова
 		{
-//			debug_hidden_log('__keywords_delete_auto', "{$object->debug_title()}: auto=$was_auto, append=$append, where=".print_r($where, true));
+//			bors_debug::syslog('__keywords_delete_auto', "{$object->debug_title()}: auto=$was_auto, append=$append, where=".print_r($where, true));
 			$db->delete('bors_keywords_index', $where);
 		}
 
@@ -139,7 +139,7 @@ class common_keyword_bind extends base_page_db
 			'target_object_id' => $object->id(),
 		);
 
-		debug_hidden_log('__keywords_delete', 'where='.print_r($where, true));
+		bors_debug::syslog('__keywords_delete', 'where='.print_r($where, true));
 		$db->delete('bors_keywords_index', $where);
 	}
 }

@@ -34,7 +34,7 @@ class bors_keywords_link extends base_object_db
 		if($was_auto) // Если это автоматическое добавление, то чистим тоже только автоматические.
 			$where['was_auto'] = true;
 
-		debug_hidden_log('__keywords_delete', 'where='.print_r($where, true));
+		bors_debug::syslog('__keywords_delete', 'where='.print_r($where, true));
 		$db->delete('bors_keywords_index', $where);
 
 		$container = object_property($object, 'container');
