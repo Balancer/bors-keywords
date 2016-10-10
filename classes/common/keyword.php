@@ -4,7 +4,7 @@ require_once __DIR__.'/../inc/text/Stem_ru.php';
 
 class common_keyword extends bors_page_db
 {
-	function db_name() { return config('main_bors_db'); }
+	function db_name() { return \B2\Cfg::get('main_bors_db'); }
 	function table_name() { return 'bors_keywords'; }
 
     function table_fields()
@@ -76,8 +76,8 @@ class common_keyword extends bors_page_db
 		return $x;
 	}
 
-	function url() { return config('tags_root_url', 'http://forums.balancer.ru/tags').'/'.trim($this->title()).'/'; }
-	function url_ex($page) { return config('tags_root_url', 'http://forums.balancer.ru/tags').'/'.trim($this->title()).'/'; }
+	function url() { return \B2\Cfg::get('tags_root_url', 'http://forums.balancer.ru/tags').'/'.trim($this->title()).'/'; }
+	function url_ex($page) { return \B2\Cfg::get('tags_root_url', 'http://forums.balancer.ru/tags').'/'.trim($this->title()).'/'; }
 
 	static function keyword_search_reindex($kw, $set = false, $in_titles = false, $morfology = false)
 	{
@@ -326,7 +326,7 @@ class common_keyword extends bors_page_db
 
 	static function linkify($keywords, $base_keywords = '', $join_char = ', ', $no_style = false, $base = 'http://forums.balancer.ru/tags')
 	{
-		$base = config('tags_root_url', $base);
+		$base = \B2\Cfg::get('tags_root_url', $base);
 		$result = array();
 		foreach(array_filter($keywords) as $key)
 		{
