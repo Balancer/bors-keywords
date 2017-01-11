@@ -20,7 +20,7 @@ class Init extends AbstractMigration
 			->addColumn('is_autosearch_normalized', 'boolean')
 			->addColumn('is_moderated', 'boolean')
 
-			->addColumn('modify_time', 'integer', ['signed' => false, 'length'=>10])
+			->addColumn('modify_time', 'integer')
 
 			->addForeignKey('synonym_to', 'bors_keywords', 'id', ['delete'=> 'SET_NULL', 'update'=> 'CASCADE'])
 
