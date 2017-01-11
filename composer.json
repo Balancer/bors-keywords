@@ -1,0 +1,36 @@
+{
+	"name": "balancer/bors-keywords",
+	"type": "librarys",
+	"description": "Tags/keywords work in BORS©",
+	"keywords": ["php", "library", "bors"],
+	"homepage": "http://bors.balancer.ru/",
+	"license": "GPL-3.0",
+	"authors": [
+		{
+			"name": "Roman =Balancer= Karshiev",
+			"email": "balancer@balancer.ru"
+		}
+	],
+
+	"support": {
+		"issues": "https://bitbucket.org/Balancer/bors-core/issues",
+		"forum": "http://www.balancer.ru/support/viewforum.php?id=60",
+		"source": "https://bitbucket.org/Balancer/bors-core"
+	},
+
+	"require": {
+		"balancer/bors-core": "dev-default"
+	},
+
+	"prefer-stable": true,
+	"minimum-stability": "dev",
+
+	"autoload": {
+		"classmap": [
+			"classes/"
+		],
+		"psr-4": {
+			"B2\\": "src/"
+		}
+	}
+}
