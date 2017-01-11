@@ -2,10 +2,6 @@
 
 require __DIR__.'/../../../vendor/autoload.php';
 
-bors::init_new();
-
-require_once __DIR__.'/../../../config-host.php';
-
 return [
 	'paths' => [
 		'migrations' => __DIR__.'/migrations'
