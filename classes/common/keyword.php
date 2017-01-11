@@ -15,7 +15,6 @@ class common_keyword extends bors_page_db
 			'title' => 'keyword_original',
 			'keyword_original',
 			'keyword_forms',
-			'modify_time',
 			'targets_count',
 			'target_containers_count',
 			'description',
