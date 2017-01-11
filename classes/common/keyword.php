@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../inc/text/Stem_ru.php';
+require_once BORS_CORE.'/classes/inc/text/Stem_ru.php';
 
 class common_keyword extends bors_page_db
 {
